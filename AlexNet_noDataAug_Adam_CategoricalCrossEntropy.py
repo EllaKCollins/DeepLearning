@@ -1,4 +1,6 @@
-# AlexNet code
+# AlexNet code 
+# no batch normalisation, no dropout, without data augmentation optimizer is Adam, 
+# loss function is categorical crossentropy
 import tensorflow as tf
 import numpy as np
 from keras.models import Sequential
@@ -25,52 +27,30 @@ model = tf.keras.Sequential([
 	layers.Conv2D(filters = 96, input_shape = (224, 224, 3), kernel_size = (11, 11), strides = (4, 4), padding = 'valid', activation = 'relu'),
 	# Max-Pooling 
 	layers.MaxPooling2D(pool_size = (2, 2), strides = (2, 2), padding = 'valid'),
-	# Batch Normalisation
-	layers.BatchNormalization(),
 	# 2nd Convolutional Layer with ReLU activation
 	layers.Conv2D(filters = 256, kernel_size = (11, 11), strides = (1, 1), padding = 'valid', activation = 'relu'),
 	# Max-Pooling
 	layers.MaxPooling2D(pool_size = (2, 2), strides = (2, 2), padding = 'valid'),
-	# Batch Normalisation
-	layers.BatchNormalization(),
 	# 3rd Convolutional Layer with ReLU activation
 	layers.Conv2D(filters = 384, kernel_size = (3, 3), strides = (1, 1), padding = 'valid', activation = 'relu'),
-	# Batch Normalisation
-	layers.BatchNormalization(),
 	# 4th Convolutional Layer with ReLU activation
 	layers.Conv2D(filters = 384, kernel_size = (3, 3), strides = (1, 1), padding = 'valid', activation = 'relu'),
-	# Batch Normalisation
-	layers.BatchNormalization(),
 	# 5th Convolutional Layer with ReLU activation
 	layers.Conv2D(filters = 256, kernel_size = (3, 3), strides = (1, 1), padding = 'valid', activation = 'relu'),
 	# Max-Pooling 
 	layers.MaxPooling2D(pool_size = (2, 2), strides = (2, 2), padding = 'valid'),
-	# Batch Normalisation
-	layers.BatchNormalization(),
 	# Flattening 
 	layers.Flatten(),
 	# 1st Dense Layer 
 	layers.Dense(4096, input_shape = (224*224*3, ), activation = 'relu'),
-	# Add Dropout to prevent overfitting 
-	layers.Dropout(0.4),
-	# Batch Normalisation 
-	layers.BatchNormalization(),
 	# 2nd Dense Layer 
 	layers.Dense(4096, activation = 'relu'),
-	# Add Dropout 
-	layers.Dropout(0.4),
-	# Batch Normalisation 
-	layers.BatchNormalization(),
 	# Output Softmax Layer 
 	layers.Dense(classes, activation = 'softmax')
 ])
 
 testGen = ImageDataGenerator()
-trainGen = ImageDataGenerator(validation_split=0.15,
-                              vertical_flip=True,
-                              horizontal_flip=True,
-                              rotation_range=0.15
-                             )
+trainGen = ImageDataGenerator(validation_split=0.15)
 
 testGenerator = testGen.flow_from_directory(testRoot,
                                             target_size=(224,224),
@@ -85,20 +65,19 @@ validationGenerator = trainGen.flow_from_directory(trainRoot,
                                                    target_size=(224,224)
                                                   )
 
-
-#model.compile(optimizer="SGD",loss="categorical_crossentropy",metrics=["accuracy"])
 model.compile(optimizer = "Adam", loss= "categorical_crossentropy", metrics = ["accuracy"])
 
 model.summary()
 
 history = model.fit(trainGenerator,epochs=10,validation_data=validationGenerator)
-#model.fit(trainingData, validation_data=testingData, epochs=10)
 
-y_pred = model.predict_classes(testGenerator)
+y_pred = np.argmax(model.predict(testGenerator), axis=-1)
 
 y_true = testGenerator.labels
 
 print("Final test accuracy is {}%".format(accuracy_score(y_pred=y_pred,y_true=y_true)))
+
+model.save('noDataAug_Adam_CategoricalCrossEntropy')
 
 confMatrix = confusion_matrix(y_pred=y_pred,y_true=y_true)
 
@@ -107,5 +86,3 @@ sns.heatmap(confMatrix,annot=True,fmt=".1f",linewidths=1.5)
 mpl.xlabel("Predicted Label")
 mpl.ylabel("Actual Label")
 mpl.show()
-
-model.save('Adam_CategoricalCrossEntropy')
