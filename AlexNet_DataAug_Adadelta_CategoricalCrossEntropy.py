@@ -1,5 +1,5 @@
 # AlexNet code 
-# batch normalisation, dropout, with data augmentation optimizer is Adam, loss function is categorical crossentropy
+# batch normalisation, dropout, with data augmentation optimizer is Adadelta, loss function is categorical crossentropy
 import tensorflow as tf
 import numpy as np
 from keras.models import Sequential
@@ -10,7 +10,7 @@ from keras.utils import np_utils
 from keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras import layers
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.optimizers import Adam,SGD,RMSprop
+from tensorflow.keras.optimizers import Adam,SGD,RMSprop, Adadelta
 import seaborn as sns
 import matplotlib.pyplot as mpl
 from sklearn.metrics import accuracy_score,confusion_matrix
@@ -87,7 +87,7 @@ validationGenerator = trainGen.flow_from_directory(trainRoot,
                                                    target_size=(224,224)
                                                   )
 
-model.compile(optimizer = "Adam", loss= "categorical_crossentropy", metrics = ["accuracy"])
+model.compile(optimizer = "Adadelta", loss= "categorical_crossentropy", metrics = ["accuracy"])
 
 model.summary()
 
@@ -99,7 +99,7 @@ y_true = testGenerator.labels
 
 print("Final test accuracy is {}%".format(accuracy_score(y_pred=y_pred,y_true=y_true)))
 
-model.save('DataAug_Adam_CategoricalCrossEntropy')
+model.save('DataAug_Adadelta_CategoricalCrossEntropy')
 
 confMatrix = confusion_matrix(y_pred=y_pred,y_true=y_true)
 

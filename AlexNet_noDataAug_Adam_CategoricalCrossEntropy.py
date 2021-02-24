@@ -14,6 +14,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.optimizers import Adam,SGD,RMSprop
 import seaborn as sns
 import matplotlib.pyplot as mpl
+from sklearn.metrics import accuracy_score,confusion_matrix
 
 start_img_size = 224
 batch = 32

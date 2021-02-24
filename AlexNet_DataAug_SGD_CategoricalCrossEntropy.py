@@ -13,6 +13,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.optimizers import Adam,SGD,RMSprop
 import seaborn as sns
 import matplotlib.pyplot as mpl
+from sklearn.metrics import accuracy_score,confusion_matrix
 
 start_img_size = 224
 batch = 32
@@ -67,7 +68,11 @@ model = tf.keras.Sequential([
 ])
 
 testGen = ImageDataGenerator()
-trainGen = ImageDataGenerator(validation_split=0.15)
+trainGen = ImageDataGenerator(validation_split=0.15,
+                              vertical_flip=True,
+                              horizontal_flip=True,
+                              rotation_range=0.15
+                             )
 
 testGenerator = testGen.flow_from_directory(testRoot,
                                             target_size=(224,224),
