@@ -13,7 +13,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.optimizers import Adam,SGD,RMSprop, Adadelta
 import seaborn as sns
 import matplotlib.pyplot as mpl
-from sklearn.metrics import accuracy_score,confusion_matrix
+from sklearn.metrics import accuracy_score
 
 start_img_size = 224
 batch = 32
@@ -100,11 +100,3 @@ y_true = testGenerator.labels
 print("Final test accuracy is {}%".format(accuracy_score(y_pred=y_pred,y_true=y_true)))
 
 model.save('DataAug_Adadelta_CategoricalCrossEntropy')
-
-confMatrix = confusion_matrix(y_pred=y_pred,y_true=y_true)
-
-mpl.subplots(figsize=(6,6))
-sns.heatmap(confMatrix,annot=True,fmt=".1f",linewidths=1.5)
-mpl.xlabel("Predicted Label")
-mpl.ylabel("Actual Label")
-mpl.show()
