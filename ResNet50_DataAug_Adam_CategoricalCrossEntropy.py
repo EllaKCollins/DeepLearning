@@ -6,7 +6,7 @@ from tensorflow.keras import layers
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.optimizers import Adam,SGD,RMSprop
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from sklearn.metrics import accuracy_score,confusion_matrix
+from sklearn.metrics import accuracy_score
 
 
 base_model = ResNet50(include_top=False,weights="imagenet")
@@ -22,12 +22,6 @@ model = keras.Sequential([
     layers.Dense(4,activation="softmax")
 ])
 
-#model.add(layers.Input(shape=(224,224,3)))
-#model.add(layers.Lambda(keras.applications.resnet50.preprocess_input))
-#model.add(base_model)
-#model.add(layers.GlobalAveragePooling2D())
-#model.add()
-
 testGen = ImageDataGenerator()
 trainGen = ImageDataGenerator(validation_split=0.15,
                               vertical_flip=True,
@@ -35,15 +29,15 @@ trainGen = ImageDataGenerator(validation_split=0.15,
                               rotation_range=0.15
                              )
 
-testGenerator = testGen.flow_from_directory("/Users/manonheinhuis/Desktop/Uni/Year4AI/2A/Deep Learning/DeepLearning/archive/dataset2-master/dataset2-master/images/TEST",
+testingData = testGen.flow_from_directory("../DeepLearning/archive/dataset2-master/dataset2-master/images/TEST",
                                             target_size=(224,224),
                                             shuffle=False
                                            )
-trainGenerator = trainGen.flow_from_directory("/Users/manonheinhuis/Desktop/Uni/Year4AI/2A/Deep Learning/DeepLearning/archive/dataset2-master/dataset2-master/images/TRAIN",
+trainingData = trainGen.flow_from_directory("../DeepLearning/archive/dataset2-master/dataset2-master/images/TRAIN",
                                               subset="training",
                                               target_size=(224,224), 
                                              )
-validationGenerator = trainGen.flow_from_directory("/Users/manonheinhuis/Desktop/Uni/Year4AI/2A/Deep Learning/DeepLearning/archive/dataset2-master/dataset2-master/images/TRAIN",
+validationData = trainGen.flow_from_directory("../DeepLearning/archive/dataset2-master/dataset2-master/images/TRAIN",
                                                    subset="validation",
                                                    target_size=(224,224)
                                                   )
@@ -51,18 +45,11 @@ validationGenerator = trainGen.flow_from_directory("/Users/manonheinhuis/Desktop
 
 model.compile(optimizer="Adam",loss="categorical_crossentropy",metrics=["accuracy"])
 
-history = model.fit(trainGenerator,epochs=1,validation_data=validationGenerator)
+history = model.fit(trainingData,epochs=10,validation_data=validationData)
 
-y_pred = model.predict_classes(testGenerator)
+y_pred = model.predict_classes(testingData)
 
-y_true = testGenerator.labels
+y_true = testingData.labels
 
 print("Final test accuracy is {}%".format(accuracy_score(y_pred=y_pred,y_true=y_true)))
 
-confMatrix = confusion_matrix(y_pred=y_pred,y_true=y_true)
-
-mpl.subplots(figsize=(6,6))
-sns.heatmap(confMatrix,annot=True,fmt=".1f",linewidths=1.5)
-mpl.xlabel("Predicted Label")
-mpl.ylabel("Actual Label")
-mpl.show()
